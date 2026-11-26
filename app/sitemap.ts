@@ -1,2 +1,5 @@
 import type { MetadataRoute } from 'next';
-export default function sitemap():MetadataRoute.Sitemap{const base=process.env.NEXT_PUBLIC_SITE_URL||'http://localhost:3000';return['','/products','/enquiry'].map(path=>({url:`${base}${path}`,changeFrequency:'monthly',priority:path?0.8:1}))}
+import { SITE_URL, PUBLIC_PATHS } from '@/lib/seo';
+export default function sitemap(): MetadataRoute.Sitemap {
+  return PUBLIC_PATHS.map(path => ({ url: `${SITE_URL}${path}` }));
+}

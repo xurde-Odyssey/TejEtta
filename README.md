@@ -21,7 +21,8 @@ npm start
 
 ## Configuration
 
-- `NEXT_PUBLIC_SITE_URL`: production domain for metadata and sitemap.
+- Public SEO URLs use `https://tejbricks.com`, centralized in `lib/seo.ts`. Preview hosts do not change canonical URLs.
+- `GOOGLE_SITE_VERIFICATION`: optional real Search Console URL-prefix verification token, configured before building. DNS verification needs no application token.
 - `ENQUIRY_WEBHOOK_URL`: HTTPS endpoint receiving validated enquiry JSON. Configure a trusted inbox/CRM integration; its successful HTTP response is treated as receipt. Optional: the primary enquiry action opens WhatsApp with the completed quotation request. The customer reviews the message and taps Send; no WhatsApp API integration is required. When configured, the webhook enables a secondary direct website submission.
 
 ## Catalogue and hosting
@@ -68,3 +69,7 @@ Geometry checks: `node tests/brick-geometry.cjs`. Browser/WebGL visual inspectio
 
 
 # TejEtta
+
+## SEO maintenance
+
+See [SEO audit and deployment guide](docs/seo-deployment.md) for the findings, changed files, hosting redirects, Search Console setup and deployment checklist. Homepage and products are now prerendered: catalogue changes require a new production build/deployment. Run `npm test` and, after `npm run build -- --webpack`, run `npm run test:seo` for production HTML and browser checks.

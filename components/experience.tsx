@@ -1,14 +1,14 @@
 'use client';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { Box, Check, Copy, Flame, Rotate3D, ShieldCheck, Truck } from 'lucide-react';
 import type { Product } from '@/lib/catalogue';
 import { contact } from '@/lib/contact';
 import ContactDetails from '@/components/contact-details';
-const Brick = dynamic(()=>import('./brick'),{ssr:false,loading:()=> <div className="fallback-brick">TEJ</div>});
+import { productImages } from '@/lib/seo';
+import BrickViewer from '@/components/brick-viewer';
 export const money=(n:number)=>new Intl.NumberFormat('en-NP',{minimumFractionDigits:0,maximumFractionDigits:1}).format(n);
 export function Hero({product}:{product?:Product}) {
   const reduce=useReducedMotion();
@@ -16,16 +16,16 @@ export function Hero({product}:{product?:Product}) {
     <div className="hero-photo" aria-hidden="true"><Image src="/brickstacks.jpeg" alt="" fill priority sizes="100vw"/></div>
     <div className="hero-feature-grid">
       <div className="hero-feature-copy">
-        <div className="hero-heading"><motion.h1 initial={reduce?false:{opacity:0,y:24}} animate={{opacity:1,y:0}} transition={{duration:.8}}>BUILT FOR<br/><span>STRENGTH.</span></motion.h1></div>
+        <div className="hero-heading"><motion.h1 initial={reduce?false:{opacity:0,y:24}} animate={{opacity:1,y:0}} transition={{duration:.8}}>BUILT FOR<br/><span>STRENGTH.</span></motion.h1><noscript><style>{`.hero-heading h1{opacity:1!important;transform:none!important}`}</style></noscript></div>
         <div className="hero-difference">
           <h2>Why choose TEJ?</h2>
-          <p>Made by Shivasakti Etta Udyog, TEJ bricks bring together kiln-fired clay, a choice of grades for different building needs, and the distinctive TEJ stamp. Our No. 1 brick offers a uniform form and an exposed clay finish for masonry you want to show.</p>
+          <p>Made in Nepal by Shivasakti Etta Udyog, TEJ red clay bricks bring together kiln-fired clay, a choice of grades for different building needs, and the distinctive TEJ stamp. Our No. 1 brick offers a uniform form and an exposed clay finish for masonry you want to show.</p>
         </div>
         <div className="hero-actions"><Link className="button" href="#collection">Explore Bricks</Link><Link className="text-link" href="/enquiry">Get Quote</Link></div>
       </div>
       {product&&<section className="hero-product-card" aria-labelledby="hero-product-title">
         <div className="hero-product-heading"><div><span className="eyebrow">EXPLORE IN 360°</span><h2 id="hero-product-title">{product.name}</h2></div></div>
-        <div className="hero-product-viewer"><Brick color={product.color} showControls={false}/></div>
+        <div className="hero-product-viewer"><BrickViewer color={product.color}/></div>
         <dl className="hero-product-specs">
           <div><dt>Dimensions · L × W × H</dt><dd>10 × 5 × 3 <small>inches</small></dd></div>
           <div><dt>Price per {product.unit}</dt><dd>{product.price!==null?`Rs. ${money(product.price)}`:'On request'}</dd></div>
@@ -37,7 +37,48 @@ export function Hero({product}:{product?:Product}) {
     <div className="hero-bottom"><a className="scroll-cue" href="#factory"><span className="scroll-cue-label">SCROLL TO DISCOVER <span aria-hidden="true">↓</span></span></a></div>
   </section>;
 }
-export function Collection({products,full=false}:{products:Product[];full?:boolean}){const [active,setActive]=useState(products[0]);const reduce=useReducedMotion();return <section className={'collection section '+(full?'collection-full':'')} id="collection"><div className="section-heading" data-reveal><div><span className="eyebrow">THE TEJ COLLECTION</span><h2>CHOOSE YOUR<br/><em>STRENGTH.</em></h2></div><p>Different grades. One considered approach.<br/>Find the right foundation for your project.</p></div><div className="product-tabs" role="tablist" aria-label="Brick grades">{products.map(p=><button key={p.id} role="tab" tabIndex={p.id===active.id?0:-1} onKeyDown={e=>{const i=products.findIndex(x=>x.id===active.id);let next=-1;if(e.key==='ArrowRight')next=(i+1)%products.length;if(e.key==='ArrowLeft')next=(i+products.length-1)%products.length;if(e.key==='Home')next=0;if(e.key==='End')next=products.length-1;if(next>=0){e.preventDefault();setActive(products[next]);document.getElementById(`tab-${products[next].id}`)?.focus()}}} id={`tab-${p.id}`} aria-selected={p.id===active.id} aria-controls="product-panel" onClick={()=>setActive(p)}>{p.grade}</button>)}</div><div className="product-panel" id="product-panel" role="tabpanel" aria-labelledby={`tab-${active.id}`}><div className="collection-visual"><span className="eyebrow visual-label">FROM FACTORY TO YOUR DESIRED LOCATION</span><motion.div className="grade-brick" key={active.id} initial={reduce?false:{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:.35}}><Image src={active.id==='first'?'/brickimage.jpeg':active.id==='picket'?'/pricket.webp':active.id==='tukra'?'/tukra1.jpeg':active.id==='second'?'/Bricks/no2.jpeg':'/Bricks/Godiya.jpeg'} alt={`${active.name} TEJ brick`} fill sizes="(max-width: 700px) 88vw, 50vw" className={`showcase-product-image showcase-${active.id}`}/></motion.div>{active.id!=='tukra'&&active.id!=='first'&&active.id!=='picket'&&<span className="rotate-hint"><Rotate3D size={16}/> 360° product exploration</span>}</div><AnimatePresence mode="wait"><motion.div className="product-details" key={active.id} initial={reduce?false:{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0}} transition={{duration:.2}}><h3>{active.name}</h3><p>{active.description}</p><dl><div><dt>Recommended for</dt><dd>{active.application}</dd></div><div><dt>Sold by</dt><dd>{active.unit==='piece'?'Piece':'Full loaded tractor'}</dd></div><div><dt>Material</dt><dd>Kiln-fired clay</dd></div></dl><div className="product-price">{active.price!==null?<><strong>Rs. {money(active.price)}</strong><span>per {active.unit==='piece'?'brick':'full loaded tractor'}</span></>:<strong>Price on request</strong>}<small>{active.price!==null?'VAT-inclusive indicative rate':'Price on request'}</small></div><Link href={`/enquiry?grade=${active.id}`} className="button">Enquire about this brick</Link></motion.div></AnimatePresence></div><p className="technical-note">Product render is illustrative. Dimensions are as supplied; confirm tolerances and suitability before ordering. Technical test results are available only when confirmed by the manufacturer.</p></section>}
+export function Collection({products,full=false}:{products:Product[];full?:boolean}) {
+  const [active,setActive]=useState(products[0]);
+  const reduce=useReducedMotion();
+  const Heading = full ? 'h1' : 'h2';
+  const ProductHeading = full ? 'h2' : 'h3';
+  // Keep every grade in server HTML; tabs enhance the same content for all visitors.
+  useEffect(() => {
+    const selectHash = () => {
+      const product = products.find(p => `#product-${p.id}` === window.location.hash);
+      if (product) setActive(product);
+    };
+    selectHash();
+    window.addEventListener('hashchange', selectHash);
+    return () => window.removeEventListener('hashchange', selectHash);
+  }, [products]);
+  return <section className={'collection section '+(full?'collection-full':'')} id="collection">
+    <div className="section-heading" data-reveal><div><span className="eyebrow">THE TEJ COLLECTION</span><Heading className="collection-heading">CHOOSE YOUR<br/><em>STRENGTH.</em></Heading></div><p>Red clay brick grades for your project.<br/>Compare TEJ bricks, prices and applications.</p></div>
+    <div className="product-tabs" role="tablist" aria-label="Brick grades">{products.map(p=><button key={p.id} role="tab" tabIndex={p.id===active.id?0:-1} onKeyDown={e=>{
+      const i=products.findIndex(x=>x.id===active.id);let next=-1;
+      if(e.key==='ArrowRight')next=(i+1)%products.length;
+      if(e.key==='ArrowLeft')next=(i+products.length-1)%products.length;
+      if(e.key==='Home')next=0;if(e.key==='End')next=products.length-1;
+      if(next>=0){e.preventDefault();setActive(products[next]);document.getElementById(`tab-${products[next].id}`)?.focus()}
+    }} id={`tab-${p.id}`} aria-selected={p.id===active.id} aria-controls={`product-${p.id}`} onClick={()=>setActive(p)}>{p.grade}</button>)}</div>
+    {products.map(p=><div key={p.id} className="product-panel" id={`product-${p.id}`} role="tabpanel" tabIndex={0} aria-labelledby={`tab-${p.id}`} data-active={p.id===active.id}>
+      <div className="collection-visual"><span className="eyebrow visual-label">FROM FACTORY TO YOUR DESIRED LOCATION</span>
+        <motion.div className="grade-brick" initial={false} animate={{opacity:p.id===active.id?1:0,y:reduce||p.id===active.id?0:8}} transition={{duration:.35}}>
+          <Image src={productImages[p.id]} alt={`${p.name} — TEJ ${p.grade.toLowerCase()} clay brick${p.id==='tukra'?' material':''}`} fill sizes="(max-width: 700px) 88vw, 50vw" className={`showcase-product-image showcase-${p.id}`}/>
+        </motion.div>
+        {p.id!=='tukra'&&p.id!=='first'&&p.id!=='picket'&&<span className="rotate-hint"><Rotate3D size={16}/> 360° product exploration</span>}
+      </div>
+      <motion.div className="product-details" initial={false} animate={{opacity:p.id===active.id?1:0,y:reduce||p.id===active.id?0:10}} transition={{duration:.2}}>
+        <ProductHeading className="product-name">{p.name}</ProductHeading><p>{p.description}</p>
+        <dl><div><dt>Recommended for</dt><dd>{p.application}</dd></div><div><dt>Sold by</dt><dd>{p.unit==='piece'?'Piece':'Full loaded tractor'}</dd></div><div><dt>Material</dt><dd>Kiln-fired clay</dd></div></dl>
+        <div className="product-price">{p.price!==null?<><strong>Rs. {money(p.price)}</strong><span>per {p.unit==='piece'?'brick':'full loaded tractor'}</span></>:<strong>Price on request</strong>}<small>{p.price!==null?'VAT-inclusive indicative rate':'Price on request'}</small></div>
+        <Link href={`/enquiry?grade=${p.id}`} className="button">Enquire about {p.name}</Link>
+      </motion.div>
+    </div>)}
+    <noscript><style>{`.product-tabs{display:none!important}.product-panel[data-active="false"]{display:grid!important}.product-panel .product-details,.product-panel .grade-brick{opacity:1!important;transform:none!important}.product-panel{margin-bottom:40px}`}</style></noscript>
+    <p className="technical-note">Product render is illustrative. Dimensions are as supplied; confirm tolerances and suitability before ordering. Technical test results are available only when confirmed by the manufacturer.</p>
+  </section>;
+}
 export function Pricing({products}:{products:Product[]}) {
  const [id,setId]=useState(products[0].id); const [qty,setQty]=useState(1000); const [copied,setCopied]=useState(false);
  const selected=products.find(product=>product.id===id)!; const [unitPrice,setUnitPrice]=useState(String(selected.price??0));

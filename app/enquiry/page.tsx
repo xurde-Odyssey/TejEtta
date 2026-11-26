@@ -8,6 +8,9 @@ const quoteFont = Noto_Serif_Devanagari({ subsets: ['devanagari'], weight: '700'
 
 export const dynamic = 'force-dynamic';
 
+import { pageMetadata } from '@/lib/seo';
+export const metadata = pageMetadata('/enquiry', 'Request a Brick Supply & Delivery Quote', 'Request a TEJ brick quotation for your project in Nepal. Choose brick grades and quantities, share your delivery location, and contact our team.');
+
 export default async function Enquiry({ searchParams }: { searchParams: Promise<{ grade?: string; quantity?: string }> }) {
   const products = await getCatalogue();
   const params = await searchParams;
