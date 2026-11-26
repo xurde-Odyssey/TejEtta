@@ -21,6 +21,11 @@ deploy() {
   git pull --ff-only origin main
   export NODE_ENV=production
   export NEXT_PUBLIC_SITE_URL=https://tejbricks.com
+  # Shared hosting exposes more CPU cores than its thread quota allows.
+  export TEJ_BUILD_LOW_RESOURCE=1
+  export TOKIO_WORKER_THREADS=1
+  export RAYON_NUM_THREADS=1
+  export UV_THREADPOOL_SIZE=1
 
   # npm install preserves CloudLinux's managed node_modules symlink.
   npm install --include=dev --no-package-lock --no-audit --no-fund
