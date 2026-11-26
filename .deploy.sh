@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+deploy() {
+  local app_dir
+  app_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+  cd "$app_dir"
+
+  # Activate the Node.js environment created by Himalayan Host.
+  source /home2/tejbrick/nodevenv/tejbricks/24/bin/activate
+
+  if [[ "$(git branch --show-current)" != main ]]; then
+    echo 'Deployment requires the main branch.' >&2
+    return 1
+  fi
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo 'Tracked files have local changes. Resolve them before deploying.' >&2
+    return 1
+  fi
+
+  git pull --ff-only origin main
+  export NODE_ENV=production
+  export NEXT_PUBLIC_SITE_URL=https://tejbricks.com
+
+  # npm install preserves CloudLinux's managed node_modules symlink.
+  npm install --include=dev --no-package-lock --no-audit --no-fund
+  npm run build
+
+  # Passenger reloads the application after a successful build.
+  mkdir -p tmp
+  touch tmp/restart.txt
+  echo 'Build complete; application restart requested. Check https://tejbricks.com.'
+}
+
+deploy "$@"
