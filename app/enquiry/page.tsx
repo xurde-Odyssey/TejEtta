@@ -6,7 +6,6 @@ import { Noto_Serif_Devanagari } from 'next/font/google';
 
 const quoteFont = Noto_Serif_Devanagari({ subsets: ['devanagari'], weight: '700', display: 'swap' });
 
-export const metadata = { title: 'Request a quotation' };
 export const dynamic = 'force-dynamic';
 
 export default async function Enquiry({ searchParams }: { searchParams: Promise<{ grade?: string; quantity?: string }> }) {
