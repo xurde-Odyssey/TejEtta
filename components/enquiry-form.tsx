@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import WhatsAppIcon from '@/components/whatsapp-icon';
 import { buildWhatsAppEnquiry } from '@/lib/enquiry-message';
 import type { Product } from '@/lib/catalogue';
@@ -8,18 +8,31 @@ import type { Product } from '@/lib/catalogue';
 export default function EnquiryForm({ products, initialGrade, initialQuantity, enabled }: {
   products: Product[]; initialGrade?: string; initialQuantity?: string; enabled: boolean;
 }) {
-  const [grade, setGrade] = useState(products.some(p => p.id === initialGrade) ? initialGrade! : products[0].id);
-  const [quantity, setQuantity] = useState(initialQuantity && /^\d+$/.test(initialQuantity) ? initialQuantity : initialGrade === 'tukra' ? '1' : '1000');
+  const nextItemId = useRef(1);
+  const [items, setItems] = useState(() => {
+    const product = products.find(p => p.id === initialGrade) || products[0];
+    return [{ id: 0, grade: product.id, quantity: initialQuantity && /^\d+$/.test(initialQuantity) ? initialQuantity : product.unit === 'tractor' ? '1' : '1000' }];
+  });
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
   const [whatsappUrl, setWhatsappUrl] = useState('');
-  const product = products.find(p => p.id === grade)!;
+  function clearStatus() {
+    setStatus('');
+    setWhatsappUrl('');
+  }
+
+  function addProduct() {
+    const product = products.find(p => !items.some(item => item.grade === p.id));
+    if (!product) return;
+    setItems([...items, { id: nextItemId.current++, grade: product.id, quantity: product.unit === 'tractor' ? '1' : '1000' }]);
+    clearStatus();
+  }
 
   function openWhatsApp(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     if (data.get('website')) return;
-    const url = buildWhatsAppEnquiry(data, product);
+    const url = buildWhatsAppEnquiry(data, items.map(item => ({ product: products.find(p => p.id === item.grade)!, quantity: Number(item.quantity) })));
     setWhatsappUrl(url);
     setStatus('Your message is ready. Tap Send in WhatsApp to share your enquiry.');
     window.open(url, '_blank', 'noopener,noreferrer');
@@ -34,7 +47,7 @@ export default function EnquiryForm({ products, initialGrade, initialQuantity, e
     try {
       const response = await fetch('/api/enquiry', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, quantity: Number(data.quantity), consent: data.consent === 'on' }),
+        body: JSON.stringify({ ...data, items: items.map(({ grade, quantity }) => ({ grade, quantity: Number(quantity) })), consent: data.consent === 'on' }),
       });
       const result = await response.json();
       if (!response.ok) throw Error(result.error || 'Unable to send your enquiry. Please try again.');
@@ -50,9 +63,21 @@ export default function EnquiryForm({ products, initialGrade, initialQuantity, e
       <label>Your name<input name="name" autoComplete="name" required minLength={2} maxLength={100} placeholder="Full name"/></label>
       <label>Phone number<input name="phone" type="tel" autoComplete="tel" pattern="[+0-9 ()-]{7,20}" required placeholder="+977"/></label>
     </div>
-    <div className="form-row">
-      <label>Brick grade<select name="grade" value={grade} onChange={event => { setGrade(event.target.value); setQuantity(event.target.value === 'tukra' ? '1' : '1000'); }}>{products.map(p => <option key={p.id} value={p.id}>{p.name} · {p.grade}</option>)}</select></label>
-      <label>Quantity ({product.unit === 'tractor' ? 'full tractors' : 'pieces'})<input name="quantity" type="number" inputMode="numeric" min="1" max="10000000" step="1" required value={quantity} onChange={event => setQuantity(event.target.value)}/></label>
+    <div className="enquiry-products" role="group" aria-label="Products for your enquiry">
+      {items.map((item, index) => {
+        const product = products.find(p => p.id === item.grade)!;
+        return <div className="enquiry-product" key={item.id}>
+          <div className="enquiry-product-heading"><span>Product {index + 1}</span>{items.length > 1 && <button type="button" aria-label={`Remove product ${index + 1}`} onClick={() => { setItems(items.filter(row => row.id !== item.id)); clearStatus(); }}>Remove</button>}</div>
+          <div className="form-row">
+            <label>Brick grade<select name={`grade-${item.id}`} value={item.grade} onChange={event => {
+              const selected = products.find(p => p.id === event.target.value)!;
+              setItems(items.map(row => row.id === item.id ? { ...row, grade: selected.id, quantity: selected.unit === 'tractor' ? '1' : '1000' } : row));
+            }}>{products.map(p => <option key={p.id} value={p.id} disabled={items.some(row => row.id !== item.id && row.grade === p.id)}>{p.name} · {p.grade}</option>)}</select></label>
+            <label>Quantity ({product.unit === 'tractor' ? 'full tractors' : 'pieces'})<input name={`quantity-${item.id}`} type="number" inputMode="numeric" min="1" max="10000000" step="1" required value={item.quantity} onChange={event => setItems(items.map(row => row.id === item.id ? { ...row, quantity: event.target.value } : row))}/></label>
+          </div>
+        </div>;
+      })}
+      <button className="enquiry-add-product" type="button" onClick={addProduct} disabled={items.length >= products.length}><span aria-hidden="true">+</span> Add product</button>
     </div>
     <label>Delivery location<input name="location" required minLength={3} maxLength={250} placeholder="Town, district or site address" autoComplete="street-address"/></label>
     <label>Email <span>(optional)</span><input name="email" type="email" autoComplete="email" maxLength={200} placeholder="you@example.com"/></label>

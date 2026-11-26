@@ -1,8 +1,7 @@
 import { contact } from './contact';
 
-export function buildWhatsAppEnquiry(data: FormData, product: { name: string; grade: string; unit: 'piece' | 'tractor' }) {
+export function buildWhatsAppEnquiry(data: FormData, items: { product: { name: string; grade: string; unit: 'piece' | 'tractor' }; quantity: number }[]) {
   const value = (key: string) => String(data.get(key) ?? '').trim();
-  const quantity = Number(value('quantity')).toLocaleString('en-US');
   const message = [
     '*TEJ BRICKS | Quotation Request*',
     '',
@@ -11,8 +10,10 @@ export function buildWhatsAppEnquiry(data: FormData, product: { name: string; gr
     'I would like to request a quotation for the following requirement.',
     '',
     '*Order Details*',
-    `• Product: ${product.name} (${product.grade})`,
-    `• Quantity: ${quantity} ${product.unit === 'tractor' ? 'full loaded tractors' : 'pcs'}`,
+    ...items.flatMap(({ product, quantity }, index) => [
+      `• Product ${index + 1}: ${product.name} (${product.grade})`,
+      `  Quantity: ${quantity.toLocaleString('en-US')} ${product.unit === 'tractor' ? 'full loaded tractors' : 'pcs'}`,
+    ]),
     `• Delivery Location: ${value('location')}`,
     `• Project Details: ${value('message') || 'Not provided'}`,
     '',

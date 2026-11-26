@@ -40,9 +40,6 @@ export function Header() {
       for (const section of sections) {
         if (section.getBoundingClientRect().top <= offset + 1) current = section.id;
       }
-      // The footer may be too short to reach the header before scrolling ends.
-      const atBottom = window.scrollY > 0 && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
-      if (atBottom && document.getElementById('contact')) current = 'contact';
       setActive(current);
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
@@ -84,12 +81,8 @@ export function Footer() {
           <h3>Shivasakti Etta Udyog</h3>
           <p>Manufacturer of TEJ bricks.<br/>From our factory to your site.</p>
         </div>
-        <nav className="footer-navigation" aria-label="Footer navigation"><h3>Explore</h3><Link href="/products">Our bricks</Link><Link href="/#factory">Our factory</Link><Link href="/#delivery">Delivery</Link><Link href="/#pricing">Pricing & estimates</Link><Link href="/enquiry">Get in touch</Link></nav>
-        <div className="footer-reach" id="contact"><h3>Contact us</h3><div className="footer-contact-card">
-          <a href={`mailto:${contact.email}`}><span className="footer-contact-icon"><Mail size={22} aria-hidden="true"/></span><span className="footer-contact-copy"><strong>Email us</strong><small>{contact.email}</small></span></a>
-          <a className="footer-whatsapp" href={contact.whatsappUrl} target="_blank" rel="noopener noreferrer"><span className="footer-contact-icon"><WhatsAppIcon/></span><span className="footer-contact-copy"><strong>Chat on WhatsApp</strong><small>Talk to our team</small></span></a>
-          <a href={contact.phoneUrl}><span className="footer-contact-icon"><Phone size={22} aria-hidden="true"/></span><span className="footer-contact-copy"><strong>Call us</strong><small>{contact.phone}</small></span></a>
-        </div></div>
+        <nav className="footer-navigation" aria-label="Footer navigation"><h3>Explore</h3><Link href="/products">Our bricks</Link><Link href="/#factory">Our factory</Link><Link href="/#delivery">Delivery</Link><Link href="/#pricing">Pricing & estimates</Link><Link href="/#contact">Contact</Link></nav>
+
       </div>
       <div className="footer-legal"><p>© {new Date().getFullYear()} Shivasakti Etta Udyog. All rights reserved.</p><span>TEJ · Built for strength.</span><a href="#main">Back to top</a></div>
     </footer>
