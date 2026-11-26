@@ -237,7 +237,7 @@ footer{background:var(--paper);color:var(--ink)}
 /* Keep every grade photo in the same landscape frame and orientation. */
 .showcase-product-image{object-fit:cover;object-position:center;padding:0;background:var(--paper)}
 .showcase-tukra,.showcase-second,.showcase-godiya{object-fit:cover;object-position:center;padding:0}
-.showcase-picket{transform:scale(.8);transform-origin:center}
+.showcase-picket{object-fit:contain;transform:scale(.8);transform-origin:center}
 
 .collection-visual .visual-label{color:var(--clay);font-weight:700}
 
