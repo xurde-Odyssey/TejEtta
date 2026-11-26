@@ -58,7 +58,7 @@ export function Header() {
   }, [pathname]);
 
   return <header ref={header} className={`header ${pathname === '/' ? 'header-home' : ''} ${pathname === '/' && !scrolled ? 'header-transparent' : 'header-solid'}`}>
-    <Link className="logo" href="/" aria-label="Shivasakti Etta Udyog — TEJ bricks home"><span>TEJ<span className="logo-dot">▪</span></span><small className="brand-maker">BRICKS BY<strong>Shivasakti<br/>Etta Udyog</strong></small></Link>
+    <Link className="logo" href="/" aria-label="TEJ इट्टा — Shivasakti Etta Udyog home"><span>TEJ<span className="logo-nepali" lang="ne">इट्टा</span></span><small className="brand-maker">BRICKS BY<strong>Shivasakti<br/>Etta Udyog</strong></small></Link>
     <nav id="main-navigation" aria-label="Main navigation" className={open ? 'nav open' : 'nav'} onClick={() => setOpen(false)} onKeyDown={event => {
       if (event.key === 'Escape') {
         setOpen(false);

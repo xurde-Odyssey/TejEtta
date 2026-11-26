@@ -192,6 +192,8 @@ footer{background:var(--paper);color:var(--ink)}
 .header,.header.header-home,.header.header-transparent,.header.header-solid{background:#fff!important;color:var(--ink);border-color:var(--line);backdrop-filter:blur(14px)}
 .header .logo,.header .nav a,.header .menu{color:var(--ink)}
 .header .logo>span{font-family:var(--display);font-weight:700;line-height:1}
+.header .logo>span{white-space:nowrap}
+.logo .logo-nepali{display:inline-block;margin-left:8px;font-family:"Noto Sans Devanagari","Devanagari Sangam MN",sans-serif;font-size:.65em;font-weight:700;letter-spacing:0;line-height:1.4}
 .header .brand-maker{font-family:'Inter',Arial,sans-serif;color:var(--muted);border-color:var(--line)}
 .header .brand-maker strong{color:var(--ink)}
 .header .nav a:hover{color:var(--clay)}
