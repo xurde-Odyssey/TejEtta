@@ -24,7 +24,8 @@ deploy() {
 
   # npm install preserves CloudLinux's managed node_modules symlink.
   npm install --include=dev --no-package-lock --no-audit --no-fund
-  npm run build
+  # Webpack resolves CloudLinux packages outside the application directory.
+  npm run build -- --webpack
 
   # Passenger reloads the application after a successful build.
   mkdir -p tmp
