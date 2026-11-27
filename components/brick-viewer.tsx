@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 function Photo() {
-  return <div className="brick-photo-fallback"><Image src="/reference/tej-brick.png" alt="TEJ red clay brick with embossed TEJ branding" fill sizes="(max-width: 700px) 88vw, 40vw" /></div>;
+  return <div className="brick-photo-fallback"><Image src="/reference/tej-brick.png" alt="TEJ red clay brick with embossed TEJ branding" fill priority sizes="(max-width: 700px) 88vw, 40vw" /></div>;
 }
 const Brick = dynamic(() => import('./brick'), { ssr: false, loading: Photo });
 export default function BrickViewer({ color }: { color: string }) {

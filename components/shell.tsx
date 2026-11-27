@@ -40,6 +40,16 @@ export function Header() {
       for (const section of sections) {
         if (section.getBoundingClientRect().top <= offset + 1) current = section.id;
       }
+      // The final section may never reach the header before scrolling ends.
+      const contactSection = sections.find(section => section.id === 'contact');
+      if (contactSection) {
+        const bounds = contactSection.getBoundingClientRect();
+        const activationLine = offset + Math.max(0, window.innerHeight - offset) * 0.45;
+        const atPageEnd = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+        if (bounds.top <= activationLine || (atPageEnd && bounds.top < window.innerHeight)) {
+          current = 'contact';
+        }
+      }
       setActive(current);
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
