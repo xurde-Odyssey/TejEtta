@@ -4,19 +4,22 @@ import { contact } from '@/lib/contact';
 import { useEffect, useRef, useState } from 'react';
 import { Menu, X, Mail, Phone } from 'lucide-react';
 import WhatsAppIcon from '@/components/whatsapp-icon';
+import { LanguageSwitcher, useLanguage } from '@/components/language-provider';
 import Lenis from 'lenis';
 import { usePathname } from 'next/navigation';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 export function SmoothScroll() { const pathname=usePathname(); useEffect(() => { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; gsap.registerPlugin(ScrollTrigger); const lenis = new Lenis({ autoRaf: true, anchors: true }); lenis.on('scroll', ScrollTrigger.update); const ctx = gsap.context(() => { gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(el => gsap.fromTo(el, { y: 28, opacity: 0.5 }, { y: 0, opacity: 1, duration: .85, scrollTrigger: { trigger: el, start: 'top 94%', once: true } })); }); return () => { lenis.destroy(); ctx.revert(); }; }, [pathname]); return null; }
 const navigation = [
-  { id: 'main', label: 'Home', href: '/#main' },
-  { id: 'factory', label: 'Process', href: '/#factory' },
-  { id: 'collection', label: 'Our Bricks', href: '/#collection' },
-  { id: 'contact', label: 'Contact', href: '/#contact' },
+  { id: 'main', label: 'Home', nepali: 'गृहपृष्ठ', href: '/#main' },
+  { id: 'factory', label: 'Process', nepali: 'उत्पादन प्रक्रिया', href: '/#factory' },
+  { id: 'collection', label: 'Our Bricks', nepali: 'हाम्रा इट्टाहरू', href: '/#collection' },
+  { id: 'contact', label: 'Contact', nepali: 'सम्पर्क', href: '/#contact' },
 ];
 
 export function Header() {
+  const { language } = useLanguage();
+  const ne = language === 'ne';
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState('main');
@@ -67,18 +70,18 @@ export function Header() {
     };
   }, [pathname]);
 
-  return <header ref={header} className={`header ${pathname === '/' ? 'header-home' : ''} ${pathname === '/' && !scrolled ? 'header-transparent' : 'header-solid'}`}>
-    <Link className="logo" href="/" aria-label="TEJ इट्टा — Shivasakti Etta Udyog home"><span>TEJ<span className="logo-nepali" lang="ne">इट्टा</span></span><small className="brand-maker">BRICKS BY<strong>Shivasakti<br/>Etta Udyog</strong></small></Link>
-    <nav id="main-navigation" aria-label="Main navigation" className={open ? 'nav open' : 'nav'} onClick={() => setOpen(false)} onKeyDown={event => {
+  return <header lang={language} ref={header} className={`header ${pathname === '/' ? 'header-home' : ''} ${pathname === '/' && !scrolled ? 'header-transparent' : 'header-solid'}`}>
+    <Link className="logo" href="/" aria-label={ne ? 'TEJ इट्टा — शिवशक्ति इट्टा उद्योग गृहपृष्ठ' : 'TEJ इट्टा — Shivasakti Etta Udyog home'}><span>TEJ<span className="logo-nepali" lang="ne">इट्टा</span></span><small className="brand-maker">{ne ? 'उत्पादक' : 'BRICKS BY'}<strong>{ne ? 'शिवशक्ति' : 'Shivasakti'}<br/>{ne ? 'इट्टा उद्योग' : 'Etta Udyog'}</strong></small></Link>
+    <nav id="main-navigation" aria-label={ne ? 'मुख्य नेभिगेसन' : 'Main navigation'} className={open ? 'nav open' : 'nav'} onClick={() => setOpen(false)} onKeyDown={event => {
       if (event.key === 'Escape') {
         setOpen(false);
         header.current?.querySelector<HTMLButtonElement>('.menu')?.focus();
       }
     }}>
-      {navigation.map(item => <Link key={item.id} href={item.href} aria-current={active === item.id ? 'location' : undefined}>{item.label}</Link>)}
+      {navigation.map(item => <Link key={item.id} href={item.href} aria-current={active === item.id ? 'location' : undefined}>{ne ? item.nepali : item.label}</Link>)}
     </nav>
-    <Link className="button small" href="/enquiry">Get Quote</Link>
-    <button className="menu" aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open} aria-controls="main-navigation" onClick={() => setOpen(!open)}>{open ? <X/> : <Menu/>}</button>
+    <div className="header-actions"><LanguageSwitcher/></div>
+    <button className="menu" aria-label={ne ? (open ? 'मेनु बन्द गर्नुहोस्' : 'मेनु खोल्नुहोस्') : (open ? 'Close navigation' : 'Open navigation')} aria-expanded={open} aria-controls="main-navigation" onClick={() => setOpen(!open)}>{open ? <X/> : <Menu/>}</button>
   </header>;
 }
 export function Footer() {

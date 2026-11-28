@@ -1,12 +1,14 @@
 'use client';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
-function Photo() {
-  return <div className="brick-photo-fallback"><Image src="/reference/tej-brick.png" alt="TEJ red clay brick with embossed TEJ branding" fill priority sizes="(max-width: 700px) 88vw, 40vw" /></div>;
+import { useLanguage } from './language-provider';
+function Loading() {
+  const { language } = useLanguage();
+  return <div className="brick-photo-fallback" role="status">{language === 'ne' ? 'थ्रीडी इट्टा लोड हुँदैछ…' : 'Loading 3D brick…'}</div>;
 }
-const Brick = dynamic(() => import('./brick'), { ssr: false, loading: Photo });
+const Brick = dynamic(() => import('./brick'), { ssr: false, loading: Loading });
 export default function BrickViewer({ color }: { color: string }) {
+  const { language } = useLanguage();
   const [enabled, setEnabled] = useState(false);
   useEffect(() => {
     const device = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
@@ -16,7 +18,7 @@ export default function BrickViewer({ color }: { color: string }) {
     return () => clearTimeout(timer);
   }, []);
   return enabled ? <Brick color={color} showControls={false}/> : <>
-    <Photo/><button className="button small brick-load-button" type="button" onClick={() => setEnabled(true)}>Explore in 3D</button>
+    <button className="button small brick-load-button" type="button" onClick={() => setEnabled(true)}>{language === 'ne' ? 'थ्रीडीमा हेर्नुहोस्' : 'Explore in 3D'}</button>
     <noscript><style>{`.brick-load-button{display:none}`}</style></noscript>
   </>;
 }

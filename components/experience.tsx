@@ -8,32 +8,36 @@ import type { Product } from '@/lib/catalogue';
 import { contact } from '@/lib/contact';
 import { productImages } from '@/lib/seo';
 import BrickViewer from '@/components/brick-viewer';
+import { useLanguage } from '@/components/language-provider';
 export const money=(n:number)=>new Intl.NumberFormat('en-NP',{minimumFractionDigits:0,maximumFractionDigits:1}).format(n);
 export function Hero({product}:{product?:Product}) {
   const reduce=useReducedMotion();
-  return <section className="hero hero-photographic hero-featured">
+  const { language } = useLanguage();
+  const ne = language === 'ne';
+  const text = (english: string, nepali: string) => ne ? nepali : english;
+  return <section lang={language} className="hero hero-photographic hero-featured">
     <div className="hero-photo" aria-hidden="true"><Image src="/brickstacks.jpeg" alt="" fill priority sizes="100vw"/></div>
     <div className="hero-feature-grid">
       <div className="hero-feature-copy">
-        <div className="hero-heading"><motion.h1 initial={reduce?false:{opacity:0,y:24}} animate={{opacity:1,y:0}} transition={{duration:.8}}>BUILT FOR<br/><span>STRENGTH.</span></motion.h1><noscript><style>{`.hero-heading h1{opacity:1!important;transform:none!important}`}</style></noscript></div>
+        <div className="hero-heading"><motion.h1 initial={reduce?false:{opacity:0,y:24}} animate={{opacity:1,y:0}} transition={{duration:.8}}>{text('BUILT FOR', 'बलियो निर्माणको')}<br/><span>{text('STRENGTH.', 'आधार।')}</span></motion.h1><noscript><style>{`.hero-heading h1{opacity:1!important;transform:none!important}`}</style></noscript></div>
         <div className="hero-difference">
-          <h2>Why choose TEJ?</h2>
-          <p>Made in Nepal by Shivasakti Etta Udyog, TEJ red clay bricks bring together kiln-fired clay, a choice of grades for different building needs, and the distinctive TEJ stamp. Our No. 1 brick offers a uniform form and an exposed clay finish for masonry you want to show.</p>
+          <h2>{text('Why choose TEJ?', 'TEJ नै किन रोज्ने?')}</h2>
+          <p>{text('Made in Nepal by Shivasakti Etta Udyog, TEJ red clay bricks bring together kiln-fired clay, a choice of grades for different building needs, and the distinctive TEJ stamp. Our No. 1 brick offers a uniform form and an exposed clay finish for masonry you want to show.', 'शिवशक्ति इट्टा उद्योगद्वारा नेपालमै उत्पादित TEJ का रातो माटोका इट्टाहरू भट्टामा पोलिएका हुन्छन्। निर्माणका विभिन्न आवश्यकताअनुसार उपलब्ध यी इट्टाहरूमा TEJ को विशिष्ट छाप हुन्छ। हाम्रो १ नं. इट्टाको एकरूप आकार र प्राकृतिक माटोको सतहले प्लास्टर नगरी देखाइने भित्तालाई पनि आकर्षक बनाउँछ।')}</p>
         </div>
-        <div className="hero-actions"><Link className="button" href="#collection">Explore Bricks</Link><Link className="text-link" href="/enquiry">Get Quote</Link></div>
+        <div className="hero-actions"><Link className="button" href="#collection">{text('Explore Bricks', 'हाम्रा इट्टाहरू हेर्नुहोस्')}</Link><Link className="text-link" href="/enquiry">{text('Get Quote', 'मूल्य विवरण माग्नुहोस्')}</Link></div>
       </div>
       {product&&<section className="hero-product-card" aria-labelledby="hero-product-title">
-        <div className="hero-product-heading"><div><span className="eyebrow">EXPLORE IN 360°</span><h2 id="hero-product-title">{product.name}</h2></div></div>
+        <div className="hero-product-heading"><div><span className="eyebrow">{text('EXPLORE IN 360°', '३६०° मा हेर्नुहोस्')}</span><h2 id="hero-product-title">{ne ? '१ नं. इट्टा' : product.name}</h2></div></div>
         <div className="hero-product-viewer"><BrickViewer color={product.color}/></div>
         <dl className="hero-product-specs">
-          <div><dt>Dimensions · L × W × H</dt><dd>10 × 5 × 3 <small>inches</small></dd></div>
-          <div><dt>Price per {product.unit}</dt><dd>{product.price!==null?`Rs. ${money(product.price)}`:'On request'}</dd></div>
+          <div><dt>{text('Dimensions · L × W × H', 'आकार · लम्बाइ × चौडाइ × उचाइ')}</dt><dd>{text('10 × 5 × 3', '१० × ५ × ३')} <small>{text('inches', 'इन्च')}</small></dd></div>
+          <div><dt>{ne ? 'प्रति गोटा मूल्य' : `Price per ${product.unit}`}</dt><dd>{product.price!==null ? (ne ? `रु. ${new Intl.NumberFormat('ne-NP',{maximumFractionDigits:1}).format(product.price)}` : `Rs. ${money(product.price)}`) : text('On request', 'सम्पर्क गर्नुहोस्')}</dd></div>
         </dl>
-        <p className="hero-product-note">VAT-inclusive indicative rate. Confirm dimensions and final pricing when ordering. 3D model is illustrative.</p>
-        <Link className="text-link" href="/enquiry?grade=first">Enquire about No. 1 Brick</Link>
+        <p className="hero-product-note">{text('VAT-inclusive indicative rate. Confirm dimensions and final pricing when ordering. 3D model is illustrative.', 'भ्याटसहितको अनुमानित मूल्य। अर्डर गर्दा आकार र अन्तिम मूल्य पुष्टि गर्नुहोस्। थ्रीडी नमुना जानकारीका लागि मात्र हो।')}</p>
+        <Link className="text-link" href="/enquiry?grade=first">{text('Enquire about No. 1 Brick', '१ नं. इट्टाबारे बुझ्नुहोस्')}</Link>
       </section>}
     </div>
-    <div className="hero-bottom"><a className="scroll-cue" href="#factory"><span className="scroll-cue-label">SCROLL TO DISCOVER <span aria-hidden="true">↓</span></span></a></div>
+    <div className="hero-bottom"><a className="scroll-cue" href="#factory"><span className="scroll-cue-label">{text('SCROLL TO DISCOVER', 'थप जान्न तल हेर्नुहोस्')} <span aria-hidden="true">↓</span></span></a></div>
   </section>;
 }
 export function Collection({products,full=false}:{products:Product[];full?:boolean}) {
